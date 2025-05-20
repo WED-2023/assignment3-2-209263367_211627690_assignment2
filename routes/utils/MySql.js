@@ -7,8 +7,9 @@ connectionLimit:4,
   host: process.env.host,//"localhost"
   user: process.env.user,//"root"
   password: process.env.DBpassword,
-  database:process.env.database
-  // database:"mydb"
+  database:process.env.database,
+  database:"recipeswebsite",
+  port: process.env.port || 3307
 }
 const pool = new mysql.createPool(config);
 
