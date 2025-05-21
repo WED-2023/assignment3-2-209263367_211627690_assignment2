@@ -1,7 +1,7 @@
 const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
 require("dotenv").config();
-require("dotenv").config();
+const user = require("./user_utils");
 
 
 /**
@@ -19,9 +19,15 @@ async function getRecipeInformation(recipe_id) {
     });
 }
 
-async function getRecipeDetails(recipe_id) {
+async function getRecipeDetails(recipe_id, user_id) {
     let recipe_info = await getRecipeInformation(recipe_id);
     let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
+
+    let is_favorite = false;
+    let is_viewed = false;
+    //let user_saved_this_recipe = false;
+    is_favorite = await user.isRecipeFavorite(user_id ,recipe_id);
+    is_viewed = await user.isRecipeViewed(user_id ,recipe_id);
 
     return {
         id: id,
@@ -32,7 +38,8 @@ async function getRecipeDetails(recipe_id) {
         vegan: vegan,
         vegetarian: vegetarian,
         glutenFree: glutenFree,
-        
+        favorite: is_favorite,
+        viewed: is_viewed
     }
 }
 

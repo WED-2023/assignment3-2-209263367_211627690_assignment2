@@ -17,13 +17,20 @@ router.get("/random", async (req, res, next) => {
  * This path returns a full details of a recipe by its id
  */
 router.get("/:recipeId", async (req, res, next) => {
+  const recipeId = req.params.recipeId;
+  const userId = req.body.userId; // ✅ GET-safe
+
+  console.log("recipeId", recipeId);
+  console.log("userId", userId);
+
   try {
-    const recipe = await recipes_utils.getRecipeDetails(req.params.recipeId);
+    const recipe = await recipes_utils.getRecipeDetails(recipeId, userId);
     res.send(recipe);
   } catch (error) {
     next(error);
   }
 });
+
 
 
 
