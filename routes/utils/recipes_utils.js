@@ -1,33 +1,21 @@
-const axios = require("axios");
-const api_domain = "https://api.spoonacular.com/recipes";
 require("dotenv").config();
-const user = require("./user_utils");
+const user_utils = require("./user_utils");
+const api_utils = require("./recipes_utils_api");
 
-
-/**
- * Get recipes list from spooncular response and extract the relevant recipe data for preview
- * @param {*} recipes_info 
- */
-
-
-async function getRecipeInformation(recipe_id) {
-    return await axios.get(`${api_domain}/${recipe_id}/information`, {
-        params: {
-            includeNutrition: false,
-            apiKey: process.env.spooncular_apiKey
-        }
-    });
+async function getRandomRecipes(recipe_id)
+{
+    return await api_utils.getRandomRecipes(recipe_id);
 }
 
 async function getRecipeDetails(recipe_id, user_id) {
-    let recipe_info = await getRecipeInformation(recipe_id);
+    let recipe_info = await api_utils.getRecipeInformation(recipe_id);
     let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
 
     let is_favorite = false;
     let is_viewed = false;
     //let user_saved_this_recipe = false;
-    is_favorite = await user.isRecipeFavorite(user_id ,recipe_id);
-    is_viewed = await user.isRecipeViewed(user_id ,recipe_id);
+    is_favorite = await user_utils.isRecipeFavorite(user_id ,recipe_id);
+    is_viewed = await user_utils.isRecipeViewed(user_id ,recipe_id);
 
     return {
         id: id,
@@ -44,31 +32,7 @@ async function getRecipeDetails(recipe_id, user_id) {
 }
 
 
-
-
-async function getRandomRecipes() {
-  try {
-    const response = await axios.get(`${api_domain}/random`, {
-      params: {
-        number: 3,
-        apiKey: process.env.spooncular_apiKey
-      }
-    });
-
-    const recipeIDs = response.data.recipes.map(r => r.id);
-    const promises = recipeIDs.map(getRecipeDetails);
-    const details = await Promise.all(promises);
-    return details;
-
-  } catch (error) {
-    console.error("Error in get3RandomRecipes:", error.response?.data || error.message);
-    throw error;
-  }
-}
-
-
 module.exports = {
-  getRecipeInformation,
   getRecipeDetails,
   getRandomRecipes
 };
