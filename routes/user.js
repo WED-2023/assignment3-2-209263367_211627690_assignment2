@@ -48,6 +48,16 @@ router.get('/favorites', async (req, res, next) => {
   }
 });
 
+router.get('/myRecipes', async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const my_recipes = await user_utils.getMyRecipes(user_id);
+    res.status(200).json(my_recipes);
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 
 

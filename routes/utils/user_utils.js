@@ -34,9 +34,15 @@ async function isRecipeViewed(user_id, recipe_id){
   return result.length > 0;
 }
 
+async function getMyRecipes(user_id){
+    const result = await DButils.execQuery(`CALL get_my_recipes_json(${user_id})`);
+    return result[0][0].recipes;
+}
+
 
 
 exports.markAsFavorite = markAsFavorite;
 exports.getFavoriteRecipes = getFavoriteRecipes;
 exports.isRecipeFavorite = isRecipeFavorite;
 exports.isRecipeViewed = isRecipeViewed;
+exports.getMyRecipes = getMyRecipes;
