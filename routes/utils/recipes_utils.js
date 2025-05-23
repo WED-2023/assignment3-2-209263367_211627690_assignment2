@@ -2,12 +2,13 @@ require("dotenv").config();
 const user_utils = require("./user_utils");
 const api_utils = require("./recipes_utils_api");
 
-async function getRandomRecipes(recipe_id)
-{
-    return await api_utils.getRandomRecipes(recipe_id);
+async function getRandomRecipes() {
+  const raw_recipes = await api_utils.getRandomRecipesRaw();
+  const promises = raw_recipes.map((r) => getRecipeDetails(r.id));
+  return await Promise.all(promises);
 }
 
-async function getRecipeDetails(recipe_id, user_id) {
+async function getRecipeDetails(recipe_id, user_id=null) {
     let recipe_info = await api_utils.getRecipeInformation(recipe_id);
     let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
 
@@ -32,10 +33,10 @@ async function getRecipeDetails(recipe_id, user_id) {
 }
 
 
+
+
 module.exports = {
   getRecipeDetails,
-  getRandomRecipes
+  getRandomRecipes,
 };
-
-
 
