@@ -4,10 +4,21 @@ async function markAsFavorite(user_id, recipe_id){
     await DButils.execQuery(`insert into favorites values ('${user_id}',${recipe_id})`);
 }
 
-async function getFavoriteRecipes(user_id){
-    const recipes_id = await DButils.execQuery(`select recipe_id from favorites where user_id='${user_id}'`);
-    return recipes_id;
+async function getFavoriteRecipes(user_id) {
+  const result = await DButils.execQuery(`CALL my_favorite_json(${user_id})`);
+  return JSON.parse(result[0][0].favorite_recipes); 
+//   [
+//   [ // index 0 - rows returned by SELECT inside the procedure
+//     {
+//       favorite_recipes: '[{...}, {...}]' // JSON string בתוך אובייקט
+//     }
+//   ],
+//   [ // index 1 - metadata (fields, column info, וכו')
+//     ...
+//   ]
+// ]
 }
+
 
 async function isRecipeFavorite(user_id, recipe_id){
     const result = await DButils.execQuery(
