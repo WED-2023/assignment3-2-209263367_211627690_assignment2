@@ -6,7 +6,7 @@ async function markAsFavorite(user_id, recipe_id){
 
 async function getFavoriteRecipes(user_id) {
   const result = await DButils.execQuery(`CALL my_favorite_json(${user_id})`);
-  return JSON.parse(result[0][0].favorite_recipes); 
+  return result[0][0].favorite_recipes; 
 //   [
 //   [ // index 0 - rows returned by SELECT inside the procedure
 //     {
