@@ -26,9 +26,19 @@ async function getRecipeInformation(recipe_id) {
     });
 }
 
+async function getRecipeInstructions(recipe_id) {
+    return await axios.get(`${api_domain}/${recipe_id}/analyzedInstructions`, {
+        params: {
+            id: recipe_id,
+            stepBreakdown: true,
+            apiKey: process.env.spooncular_apiKey
+        }
+    });
+}
 
 
 module.exports = {
   getRandomRecipesRaw,
   getRecipeInformation,
+  getRecipeInstructions,
 };

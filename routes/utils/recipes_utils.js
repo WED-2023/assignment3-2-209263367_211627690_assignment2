@@ -14,7 +14,6 @@ async function getRecipeDetails(recipe_id, user_id=null) {
 
     let is_favorite = false;
     let is_viewed = false;
-    //let user_saved_this_recipe = false;
     is_favorite = await user_utils.isRecipeFavorite(user_id ,recipe_id);
     is_viewed = await user_utils.isRecipeViewed(user_id ,recipe_id);
 
@@ -32,11 +31,43 @@ async function getRecipeDetails(recipe_id, user_id=null) {
     }
 }
 
+async function getFullRecipeDetails(recipe_id, user_id=null) {
+    let recipe_info = await api_utils.getRecipeInformation(recipe_id);
+    let recipe_instructions = await api_utils.getRecipeInstructions(recipe_id);
+    let recipe_instructions_as_string = "";
+    try {
+      recipe_instructions_as_string = recipe_instructions.data[0].steps.map((step) => step.step).join("\n");
+    }
+    catch (error) {
+      recipe_instructions_as_string = "No instructions available.";
+    }
+    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
+
+    let is_favorite = false;
+    let is_viewed = false;
+    is_favorite = await user_utils.isRecipeFavorite(user_id ,recipe_id);
+    is_viewed = await user_utils.isRecipeViewed(user_id ,recipe_id);
+
+    return {
+        id: id,
+        title: title,
+        readyInMinutes: readyInMinutes,
+        image: image,
+        popularity: aggregateLikes,
+        vegan: vegan,
+        vegetarian: vegetarian,
+        glutenFree: glutenFree,
+        favorite: is_favorite,
+        viewed: is_viewed,
+        recipeInstructions: recipe_instructions_as_string
+    }
+}
 
 
 
 module.exports = {
   getRecipeDetails,
   getRandomRecipes,
+  getFullRecipeDetails,
 };
 

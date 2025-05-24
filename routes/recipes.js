@@ -18,13 +18,30 @@ router.get("/random", async (req, res, next) => {
  */
 router.get("/:recipeId", async (req, res, next) => {
   const recipeId = req.params.recipeId;
-  const userId = req.body.userId; // ✅ GET-safe
+  const userId = req.body.userId; 
 
+  console.log("Received request for recipe details");
   console.log("recipeId", recipeId);
   console.log("userId", userId);
 
   try {
     const recipe = await recipes_utils.getRecipeDetails(recipeId, userId);
+    res.send(recipe);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/PreviewRecipe/:recipeId', async (req, res, next) => {
+  const recipeId = req.params.recipeId;
+  const userId = req.body.userId; 
+
+  console.log("PreviewRecipe called");
+  console.log("recipeId", recipeId);
+  console.log("userId", userId);
+
+  try {
+    const recipe = await recipes_utils.getFullRecipeDetails(recipeId, userId);
     res.send(recipe);
   } catch (error) {
     next(error);
