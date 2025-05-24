@@ -41,8 +41,13 @@ async function getFullRecipeDetails(recipe_id, user_id=null) {
     catch (error) {
       recipe_instructions_as_string = "No instructions available.";
     }
-    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
-
+    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree, servings, extendedIngredients} = recipe_info.data;
+    try {
+      extendedIngredients = extendedIngredients.map((ingredient) => ingredient.original).join("\n");
+    }
+    catch (error) {
+      extendedIngredients = "No ingredients available.";
+    }
     let is_favorite = false;
     let is_viewed = false;
     is_favorite = await user_utils.isRecipeFavorite(user_id ,recipe_id);
@@ -59,7 +64,9 @@ async function getFullRecipeDetails(recipe_id, user_id=null) {
         glutenFree: glutenFree,
         favorite: is_favorite,
         viewed: is_viewed,
-        recipeInstructions: recipe_instructions_as_string
+        amount: servings,
+        ingredients: extendedIngredients,
+        instructions: recipe_instructions_as_string
     }
 }
 
