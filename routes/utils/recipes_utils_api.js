@@ -36,9 +36,50 @@ async function getRecipeInstructions(recipe_id) {
     });
 }
 
+async function searchRecipes(input_json) {
+  const {
+    query = '',
+    cuisine = '',
+    diet = '',
+    intolerances = '',
+    number = 5,
+    sort = '' // preparationTime | popularity
+  } = input_json;
+
+  const sortMap = {
+    preparationTime: 'readyInMinutes',
+    popularity: 'popularity'
+  };
+
+  const response = await axios.get(`${api_domain}/complexSearch`, {
+    params: {
+      apiKey: process.env.spooncular_apiKey,
+      query,
+      cuisine,
+      diet,
+      intolerances,
+      number,
+      sort: sortMap[sort] || '',
+      addRecipeInformation: true // returns instructions and more details
+    }
+  });
+
+  return response.data.results.map((recipe) => ({
+    id: recipe.id,
+    title: recipe.title,
+    image: recipe.image,
+    readyInMinutes: recipe.readyInMinutes,
+    popularity: recipe.aggregateLikes,
+    vegan: recipe.vegan,
+    vegetarian: recipe.vegetarian,
+    glutenFree: recipe.glutenFree
+  }));
+}
+
 
 module.exports = {
   getRandomRecipesRaw,
   getRecipeInformation,
   getRecipeInstructions,
+  searchRecipes,
 };

@@ -97,10 +97,39 @@ async function CreateNewRecipe(recipe_json) {
 }
 
 
+async function searchRecipes(input_json){
+  const {
+    query = '',
+    cuisine = '',
+    diet = '',
+    intolerances = '',
+    number = 5,
+    sort = '' // preparationTime | popularity
+  } = input_json;
+
+  json_for_query = {
+    query,
+    cuisine,
+    diet,
+    intolerances,
+    number,
+    sort: sortMap[sort] || '',
+    addRecipeInformation: true
+  };
+  const response = await api_utils.searchRecipes(json_for_query);
+  if (!response || !response.data || !response.data.results) {
+    throw new Error("No recipes found");
+  }
+
+  return response
+}
+
+
 module.exports = {
   getRecipeDetails,
   getRandomRecipes,
   getFullRecipeDetails,
   CreateNewRecipe,
+  searchRecipes,
 };
 
