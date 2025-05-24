@@ -1,6 +1,7 @@
 require("dotenv").config();
 const user_utils = require("./user_utils");
 const api_utils = require("./recipes_utils_api");
+const db_utils = require("./recipes_utils_db");
 
 async function getRandomRecipes() {
   const raw_recipes = await api_utils.getRandomRecipesRaw();
@@ -70,11 +71,24 @@ async function getFullRecipeDetails(recipe_id, user_id=null) {
     }
 }
 
+async function CreateNewRecipe(recipe_json) {
+  // Validate the recipe_json object
+  if (!recipe_json || !recipe_json.title || !recipe_json.image_url || !recipe_json.prep_time || !recipe_json.servings || !recipe_json.instructions) {
+    throw new Error("Invalid recipe data");
+  }
+
+  // Create a new recipe in the database
+  const newRecipe = await db_utils.createNewRecipe(recipe_json);
+  
+  // Return the newly created recipe
+  return newRecipe;
+}
 
 
 module.exports = {
   getRecipeDetails,
   getRandomRecipes,
   getFullRecipeDetails,
+  CreateNewRecipe,
 };
 
