@@ -58,6 +58,17 @@ router.get('/myRecipes', async (req, res, next) => {
   }
 });
 
+router.get('/myFamilyRecipes', async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const my_family_recipes = await user_utils.getMyFamilyRecipes(user_id);
+    res.status(200).json(my_family_recipes);
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 
 
 
