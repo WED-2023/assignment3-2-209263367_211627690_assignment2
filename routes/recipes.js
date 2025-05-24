@@ -84,6 +84,12 @@ router.post('/CreateNewRecipe', async (req, res, next) => {
     const recipe = await recipes_utils.CreateNewRecipe(recipe_json);
     res.status(200).send({ message: "Recipe added", success: true });
   } catch (error) {
+    console.error("Error creating new recipe:", error);
+    if (error.message === 'Invalid recipe data') {
+      res.status(400).send({ message: error.message, success: false });
+      return;
+    }
+    res.status(500).send({ message: error.message, success: false });
     next(error);
   }
 });

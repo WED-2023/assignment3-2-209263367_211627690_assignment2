@@ -73,7 +73,19 @@ async function getFullRecipeDetails(recipe_id, user_id=null) {
 
 async function CreateNewRecipe(recipe_json) {
   // Validate the recipe_json object
-  if (!recipe_json || !recipe_json.title || !recipe_json.image_url || !recipe_json.prep_time || !recipe_json.servings || !recipe_json.instructions) {
+  if (
+  !recipe_json ||
+  recipe_json.title == null ||
+  recipe_json.image_url == null ||
+  recipe_json.prep_time == null ||
+  recipe_json.servings == null ||
+  recipe_json.instructions == null ||
+  recipe_json.extendedIngredients == null ||
+  recipe_json.likes_count == null ||
+  recipe_json.is_vegan == null ||
+  recipe_json.is_vegetarian == null ||
+  recipe_json.is_gluten_free == null
+) {
     throw new Error("Invalid recipe data");
   }
 
