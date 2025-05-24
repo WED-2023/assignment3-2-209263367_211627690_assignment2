@@ -130,11 +130,53 @@ async function searchRecipes(input_json){
 }
 
 
+async function markAsViewed(user_id, recipe_id, origin) {
+  await db_utils.markAsViewed(user_id, recipe_id, origin);
+}
+
+/**
+ * This function retrieves a recipe from the database by its ID.
+ * @param {*} recipe_id 
+ * @param {*} user_id 
+ * @returns json object with recipe details
+ */
+async function getRecipeFromDB(recipe_id, user_id = null) {
+  try {
+    const recipe_query = await db_utils.getRecipeFromDB(recipe_id);
+
+    if (recipe_query.length === 0) {
+      throw new Error("Recipe not found in DB");
+    }
+
+    const recipe = recipe_query[0];
+
+    const is_favorite = user_id ? await user_utils.isRecipeFavorite(user_id, recipe_id) : false;
+    const is_viewed = user_id ? await user_utils.isRecipeViewed(user_id, recipe_id) : false;
+
+    return {
+      id: recipe.id,
+      title: recipe.title,
+      readyInMinutes: recipe.prep_time,
+      image: recipe.image_url,
+      popularity: recipe.likes_count,
+      vegan: recipe.is_vegan === 1,
+      vegetarian: recipe.is_vegetarian === 1,
+      glutenFree: recipe.is_gluten_free === 1,
+      favorite: is_favorite,
+      viewed: is_viewed
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
 module.exports = {
   getRecipeDetails,
   getRandomRecipes,
   getFullRecipeDetails,
   CreateNewRecipe,
   searchRecipes,
+  markAsViewed,
+  getRecipeFromDB
 };
 

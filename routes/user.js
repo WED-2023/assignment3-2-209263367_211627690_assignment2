@@ -68,9 +68,25 @@ router.get('/myFamilyRecipes', async (req, res, next) => {
   }
 });
 
+router.get('/lastWatchedRecipes', async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
 
-
-
-
+    const last_watched = await user_utils.getLastWatchedRecipes(user_id);
+    const recipeDetailsPromises = last_watched.map(async (entry) => {
+      if (entry.origin === "API") {
+        return await recipe_utils.getRecipeDetails(entry.recipe_id, user_id);
+      } else if (entry.origin === "DB") {
+        return await recipe_utils.getRecipeFromDB(entry.recipe_id, user_id);
+      } else {
+        throw new Error(`Unknown recipe origin: ${entry.origin}`);
+      }
+    });
+    const detailedRecipes = await Promise.all(recipeDetailsPromises);
+    res.status(200).json(detailedRecipes);
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;

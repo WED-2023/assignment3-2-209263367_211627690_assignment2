@@ -84,7 +84,7 @@ router.get('/PreviewRecipe/:recipeId', async (req, res, next) => {
 
   try {
     const recipe = await recipes_utils.getFullRecipeDetails(recipeId, userId);
-    res.send(recipe);
+    res.status(200).send({recipe, origin: 'API'});
   } catch (error) {
     next(error);
   }
@@ -132,6 +132,26 @@ router.post('/CreateNewRecipe', async (req, res, next) => {
       return;
     }
     res.status(500).send({ message: error.message, success: false });
+    next(error);
+  }
+});
+
+/** 
+ * Set recipe as viewed
+ */
+router.post('/viewed', async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const recipe_id = req.body.recipeId;
+    // Client should send the origin of the view.
+    // The image should contain spoonacular -> 'API' or 'DB'.
+    // Client is responsible for sending the correct origin.
+    const origin = req.body.origin;
+    
+    await user_utils.markAsViewed(user_id, recipe_id, origin);
+    res.status(200).send("The Recipe successfully marked as viewed");
+    
+  } catch (error) {
     next(error);
   }
 });

@@ -50,8 +50,20 @@ async function createNewRecipe(recipe_json) {
   }
 }
 
+async function markAsViewed(user_id, recipe_id, origin) {
+  await DButils.execQuery(`INSERT INTO views (user_id, recipe_id, timestamp, origin) VALUES (${user_id}, ${recipe_id}, NOW(), '${origin}')`);
+}
 
 
+async function getRecipeFromDB(recipeId) {
+  const recipe_query = await DButils.execQuery(
+      `SELECT * FROM recipes WHERE id = ${recipeId}`
+    );
+
+  return recipe_query
+}
 
 
 exports.createNewRecipe = createNewRecipe;
+exports.markAsViewed = markAsViewed;
+exports.getRecipeFromDB = getRecipeFromDB;

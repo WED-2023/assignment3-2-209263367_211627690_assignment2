@@ -44,6 +44,10 @@ async function getMyFamilyRecipes(user_id){
     return result[0][0].family_recipes;
 }
 
+async function getLastWatchedRecipes(user_id) {
+    const result = await DButils.execQuery(`CALL get_last_watched_recipes_json(${user_id})`);
+    return result[0][0].last_watched_recipes;
+}
 
 
 exports.markAsFavorite = markAsFavorite;
@@ -52,3 +56,4 @@ exports.isRecipeFavorite = isRecipeFavorite;
 exports.isRecipeViewed = isRecipeViewed;
 exports.getMyRecipes = getMyRecipes;
 exports.getMyFamilyRecipes = getMyFamilyRecipes;
+exports.getLastWatchedRecipes = getLastWatchedRecipes;
