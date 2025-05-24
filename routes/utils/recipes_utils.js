@@ -107,17 +107,22 @@ async function searchRecipes(input_json){
     sort = '' // preparationTime | popularity
   } = input_json;
 
+  const sortMap = {
+    preparationTime: 'readyInMinutes',
+    popularity: 'popularity'
+  };
+
   json_for_query = {
     query,
     cuisine,
     diet,
     intolerances,
     number,
-    sort: sortMap[sort] || '',
+    sort,
     addRecipeInformation: true
   };
   const response = await api_utils.searchRecipes(json_for_query);
-  if (!response || !response.data || !response.data.results) {
+  if (response == null || response.length == 0) {
     throw new Error("No recipes found");
   }
 
