@@ -133,7 +133,7 @@ router.post('/CreateNewRecipe', async (req, res, next) => {
     is_gluten_free
   };
   try {
-    const recipe = await recipes_utils.CreateNewRecipe(recipe_json);
+    await recipes_utils.CreateNewRecipe(recipe_json);
     res.status(200).send({ message: "Recipe added", success: true });
   } catch (error) {
     console.error("Error creating new recipe:", error);

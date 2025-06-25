@@ -90,10 +90,10 @@ async function CreateNewRecipe(recipe_json) {
   }
 
   // Create a new recipe in the database
-  const newRecipe = await db_utils.createNewRecipe(recipe_json);
+  await db_utils.createNewRecipe(recipe_json);
   
   // Return the newly created recipe
-  return newRecipe;
+  
 }
 
 
