@@ -15,10 +15,12 @@ app.use(
     cookieName: "session", // the cookie key name
     //secret: process.env.COOKIE_SECRET, // the encryption key
     secret: "template", // the encryption key
-    duration: 24 * 60 * 60 * 1000, // expired after 20 sec
+    duration: 24 * 60 * 60 * 1000, // expired after 24 hours
     activeDuration: 1000 * 60 * 5, // if expiresIn < activeDuration,
     cookie: {
       httpOnly: false,
+      secure: false, // must be false for HTTP
+      // Remove sameSite and domain restrictions for local development
     }
     //the session will be extended by activeDuration milliseconds
   })
@@ -30,6 +32,16 @@ app.use(express.static(path.join(__dirname, "dist")));
 //remote:
 // app.use(express.static(path.join(__dirname, '../assignment-3-3-frontend/dist')));
 
+// Configure CORS before routes
+const corsConfig = {
+  origin: ['http://localhost:8080', 'http://127.0.0.1:8080'], // Explicitly allow your frontend
+  credentials: true, // Allow cookies and credentials
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+app.use(cors(corsConfig));
+app.options("*", cors(corsConfig));
+
 app.get("/",function(req,res)
 { 
   //remote: 
@@ -38,17 +50,6 @@ app.get("/",function(req,res)
   res.sendFile(__dirname+"/index.html");
 
 });
-
-app.use(cors());
-app.options("*", cors());
-
-const corsConfig = {
-  origin: true,
-  credentials: true
-};
-
-app.use(cors(corsConfig));
-app.options("*", cors(corsConfig));
 
 var port = process.env.PORT || "3000"; //local=3000 remote=80
 //#endregion
