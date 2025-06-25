@@ -4,7 +4,7 @@ async function markAsFavorite(user_id, recipe_id){
     await DButils.execQuery(`insert into favorites values ('${user_id}',${recipe_id})`);
 }
 
-async function getFavoriteRecipes(user_id) {
+async function getFavoriteRecipesDB(user_id) {
   const result = await DButils.execQuery(`CALL my_favorite_json(${user_id})`);
   return result[0][0].favorite_recipes; 
 //   [
@@ -19,6 +19,10 @@ async function getFavoriteRecipes(user_id) {
 // ]
 }
 
+async function getFavoriteRecipesORIGIN(user_id) {
+  const result = await DButils.execQuery(`SELECT recipe_id, origin FROM favorites where user_id = ${user_id}`);
+  return result; 
+}
 
 async function isRecipeFavorite(user_id, recipe_id){
     const result = await DButils.execQuery(
@@ -51,7 +55,8 @@ async function getLastWatchedRecipes(user_id) {
 
 
 exports.markAsFavorite = markAsFavorite;
-exports.getFavoriteRecipes = getFavoriteRecipes;
+exports.getFavoriteRecipesDB = getFavoriteRecipesDB;
+exports.getFavoriteRecipesORIGIN = getFavoriteRecipesORIGIN;
 exports.isRecipeFavorite = isRecipeFavorite;
 exports.isRecipeViewed = isRecipeViewed;
 exports.getMyRecipes = getMyRecipes;

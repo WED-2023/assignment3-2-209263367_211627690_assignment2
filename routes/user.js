@@ -41,8 +41,34 @@ router.post('/favorites', async (req,res,next) => {
 router.get('/favorites', async (req, res, next) => {
   try {
     const user_id = req.session.user_id;
-    const favorite_recipes = await user_utils.getFavoriteRecipes(user_id);
-    res.status(200).json(favorite_recipes);
+    // Get the list of favorite recipes (should include recipe_id and origin)
+    const favorite_recipes = await user_utils.getFavoriteRecipesORIGIN(user_id);
+
+    // For each favorite, get the full details based on its origin
+    const recipeDetailsPromises = favorite_recipes.map(async (entry) => {
+      try {
+        if (entry.origin === "API") {
+          return await recipe_utils.getRecipeDetails(entry.recipe_id, user_id);
+        } else if (entry.origin === "DB") {
+          return await recipe_utils.getRecipeFromDB(entry.recipe_id, user_id);
+        } else {
+          throw new Error(`Unknown recipe origin: ${entry.origin}`);
+        }
+      } catch (err) {
+        // Optionally log or handle the error for this entry
+        return null; // or you can return { error: err.message, recipe_id: entry.recipe_id }
+      }
+    });
+
+    // Wait for all promises to settle
+    const results = await Promise.allSettled(recipeDetailsPromises);
+
+    // Filter out failed or null results
+    const detailedRecipes = results
+      .filter(r => r.status === "fulfilled" && r.value)
+      .map(r => r.value);
+
+    res.status(200).json(detailedRecipes);
   } catch (error) {
     next(error);
   }
