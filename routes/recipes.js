@@ -3,14 +3,7 @@ var router = express.Router();
 const recipes_utils = require("./utils/recipes_utils");
 const user_utils = require("./utils/user_utils");
 
-// Authentication middleware for all /recipes routes
-// router.use((req, res, next) => {
-//   if (req.session && req.session.user_id) {
-//     next();
-//   } else {
-//     res.sendStatus(401); // Unauthorized
-//   }
-// });
+
 
 // Debug middleware for all requests to this router
 router.use((req, res, next) => {
