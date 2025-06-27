@@ -1,7 +1,18 @@
 const DButils = require("./DButils");
 
 async function markAsFavorite(user_id, recipe_id){
-    await DButils.execQuery(`insert into favorites values ('${user_id}',${recipe_id})`);
+
+  if (!user_id || !recipe_id) {
+    throw { status: 400, message: "Missing user_id or recipe_id" }; 
+  }
+
+  const exists = await DButils.execQuery(`SELECT 1 FROM favorites WHERE user_id = '${user_id}' AND recipe_id = ${recipe_id}`);
+
+  const origin = exists.length > 0 ? 'DB' : 'API';
+  const insert = `INSERT INTO favorites (user_id, recipe_id, origin) VALUES ('${user_id}', ${recipe_id}, '${origin}')`;
+  
+  await DButils.execQuery(insert);
+
 }
 
 async function getFavoriteRecipesDB(user_id) {
