@@ -3,6 +3,15 @@ var router = express.Router();
 const recipes_utils = require("./utils/recipes_utils");
 const user_utils = require("./utils/user_utils");
 
+// Authentication middleware for all /recipes routes
+// router.use((req, res, next) => {
+//   if (req.session && req.session.user_id) {
+//     next();
+//   } else {
+//     res.sendStatus(401); // Unauthorized
+//   }
+// });
+
 // Debug middleware for all requests to this router
 router.use((req, res, next) => {
   console.log(`=== RECIPES ROUTER: ${req.method} ${req.path} ===`);
@@ -70,7 +79,7 @@ router.get("/random", async (req, res, next) => {
  */
 router.get("/:recipeId", async (req, res, next) => {
   const recipeId = req.params.recipeId;
-  const userId = req.body.userId; 
+  const userId = req.session.user_id; 
 
   console.log("Received request for recipe details");
   console.log("recipeId", recipeId);
@@ -86,7 +95,7 @@ router.get("/:recipeId", async (req, res, next) => {
 
 router.get('/PreviewRecipe/:recipeId', async (req, res, next) => {
   const recipeId = req.params.recipeId;
-  const userId = req.body.userId; 
+  const userId = req.session.user_id; 
 
   console.log("PreviewRecipe called");
   console.log("recipeId", recipeId);
@@ -158,7 +167,7 @@ router.post('/viewed', async (req, res, next) => {
   
   try {
     // Try to get user_id from session first, then from request body as fallback
-    const user_id = req.session.user_id || req.body.userId;
+    const user_id = req.session.user_id //|| req.body.userId;
     const recipe_id = req.body.recipeId;
     const origin = req.body.origin;
     
