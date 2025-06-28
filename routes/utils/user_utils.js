@@ -15,6 +15,15 @@ async function markAsFavorite(user_id, recipe_id){
 
 }
 
+async function removeFavorite(user_id, recipe_id) {
+  if (!user_id || !recipe_id) {
+    throw { status: 400, message: "Missing user_id or recipe_id" };
+  }
+  await DButils.execQuery(
+    `DELETE FROM favorites WHERE user_id = '${user_id}' AND recipe_id = ${recipe_id}`
+  );
+}
+
 async function getFavoriteRecipesDB(user_id) {
   const result = await DButils.execQuery(`CALL my_favorite_json(${user_id})`);
   return result[0][0].favorite_recipes; 
@@ -73,3 +82,4 @@ exports.isRecipeViewed = isRecipeViewed;
 exports.getMyRecipes = getMyRecipes;
 exports.getMyFamilyRecipes = getMyFamilyRecipes;
 exports.getLastWatchedRecipes = getLastWatchedRecipes;
+exports.removeFavorite = removeFavorite;

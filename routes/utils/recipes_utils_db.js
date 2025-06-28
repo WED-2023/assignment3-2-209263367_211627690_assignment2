@@ -51,7 +51,25 @@ async function createNewRecipe(recipe_json) {
 }
 
 async function markAsViewed(user_id, recipe_id, origin) {
-  await DButils.execQuery(`INSERT INTO views (user_id, recipe_id, timestamp, origin) VALUES (${user_id}, ${recipe_id}, NOW(), '${origin}')`);
+  // Check if the view already exists
+  const result = await DButils.execQuery(
+    `SELECT * FROM views WHERE user_id = ? AND recipe_id = ? AND origin = ?`,
+    [user_id, recipe_id, origin]
+  );
+
+  if (result.length === 0) {
+    // Not viewed yet, insert new record
+    await DButils.execQuery(
+      `INSERT INTO views (user_id, recipe_id, timestamp, origin) VALUES (?, ?, NOW(), ?)`,
+      [user_id, recipe_id, origin]
+    );
+  } else {
+    // Already viewed, update timestamp
+    await DButils.execQuery(
+      `UPDATE views SET timestamp = NOW() WHERE user_id = ? AND recipe_id = ? AND origin = ?`,
+      [user_id, recipe_id, origin]
+    );
+  }
 }
 
 

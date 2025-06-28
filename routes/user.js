@@ -36,6 +36,25 @@ router.post('/favorites', async (req,res,next) => {
 })
 
 /**
+ * This path removes a recipe from the favorites list of the logged-in user
+ */ 
+router.delete('/favorites', async (req, res, next) => {
+  try {
+    const user_id = req.session.user_id;
+    const recipe_id = req.body.recipeId;
+
+    if (!recipe_id) {
+      throw { status: 400, message: "Missing recipe_id" };
+    }
+
+    await user_utils.removeFavorite(user_id, recipe_id);
+    res.status(200).send("The Recipe successfully removed from favorites");
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
  * This path returns the favorites recipes that were saved by the logged-in user
  */
 router.get('/favorites', async (req, res, next) => {
