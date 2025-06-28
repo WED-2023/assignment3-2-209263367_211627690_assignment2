@@ -134,4 +134,40 @@ router.get('/lastWatchedRecipes', async (req, res, next) => {
   }
 });
 
+router.get('/searchUsers', async (req, res, next) => {
+  try {
+    const { first_name, last_name } = req.query;
+    const results = await user_utils.searchUsersByName(first_name, last_name);
+    res.status(200).json(results);
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+/**
+ * This path adds a family member for the logged-in user
+ * Expects: { family_username: "other_username" } in the request body
+ */
+router.post('/addToFamily', async (req, res, next) => {
+  try {
+    // Assuming you store the username in the session after login
+    const user_id = req.session.user_id;
+    const { family_username } = req.body;
+
+    const my_username = await user_utils.getUsernameFromUserId(user_id);
+    if (!my_username) {
+      return res.status(401).send({ message: "Not logged in" });
+    }
+    if (!family_username) {
+      return res.status(400).send({ message: "Missing family_username" });
+    }
+
+    await user_utils.addFamilyMember(my_username, family_username);
+    res.status(200).send({ message: "Family member added successfully" });
+  } catch (error) {
+    res.status(error.status || 500).send({ message: error.message || "Internal server error" });
+  }
+});
+
 module.exports = router;

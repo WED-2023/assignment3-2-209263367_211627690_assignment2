@@ -74,6 +74,74 @@ async function getLastWatchedRecipes(user_id) {
 }
 
 
+
+async function searchUsersByName(first_name, last_name) {
+  if (!first_name && !last_name) {
+    throw { status: 400, message: "At least one of first_name or last_name must be provided" };
+  }
+
+  let query = `SELECT CONCAT(firstname, ' ', lastname) as full_name, username FROM users WHERE `;
+  const conditions = [];
+  
+  if (first_name) {
+    conditions.push(`firstname LIKE '%${first_name}%'`);
+  }
+  
+  if (last_name) {
+    conditions.push(`lastname LIKE '%${last_name}%'`);
+  }
+  
+  query += conditions.join(' OR ');
+
+  const result = await DButils.execQuery(query);
+  return result;
+}
+
+
+
+async function addFamilyMember(my_username, family_username) {
+  if (!my_username || !family_username) {
+    throw { status: 400, message: "Both usernames are required" };
+  }
+
+  // Check if the relationship already exists
+  const exists = await DButils.execQuery(
+    `SELECT 1 FROM family WHERE my_username = ? AND family_username = ?`,
+    [my_username, family_username]
+  );
+
+  if (exists.length > 0) {
+    throw { status: 409, message: "Family member already exists" };
+  }
+
+  // Insert new relationship
+  await DButils.execQuery(
+  `INSERT INTO family (my_username, family_username) VALUES (?, ?), (?, ?)`,
+  [my_username, family_username, family_username, my_username]
+  );
+}
+
+
+async function getUsernameFromUserId(user_id) {
+  if (!user_id) {
+    throw { status: 400, message: "Missing user_id" };
+  }
+
+  const result = await DButils.execQuery(
+    `SELECT username FROM users WHERE id = ?`,
+    [user_id]
+  );
+
+  if (result.length === 0) {
+    throw { status: 404, message: "User not found" };
+  }
+
+  return result[0].username;
+}
+
+exports.getUsernameFromUserId = getUsernameFromUserId;
+exports.addFamilyMember = addFamilyMember;
+exports.searchUsersByName = searchUsersByName;
 exports.markAsFavorite = markAsFavorite;
 exports.getFavoriteRecipesDB = getFavoriteRecipesDB;
 exports.getFavoriteRecipesORIGIN = getFavoriteRecipesORIGIN;
